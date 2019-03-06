@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sytem/pkm/internal"
+	"github.com/pikayem/pkm/internal"
 )
 
 func main() {
