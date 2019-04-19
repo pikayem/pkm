@@ -131,7 +131,7 @@ func serverSetup() {
 
 	obsServers = make([]obsServer, len(servers))
 	for i, v := range servers {
-		log.Printf("%d:%s", i)
+		log.Printf("%d:%v", i, v)
 		obsServers[i].address = v["address"].(string)
 		obsServers[i].port = v["port"].(string)
 		if err = obsServers[i].Connect(); err != nil {
@@ -153,7 +153,7 @@ func (obs obsServer) Connect() error {
 	if err != nil {
 		return fmt.Errorf("Yhteys OBS-palvelimeen %s epäonnistui: %s", obs.host(), err)
 	}
-	log.Printf("Yhteys OBS-palvelimeen %s avattu", obs.host)
+	log.Printf("Yhteys OBS-palvelimeen %s avattu", obs.host())
 
 	for i := 1; i <= 10; i++ {
 		obs.SetVisibility("cam"+strconv.Itoa(i), false)
