@@ -60,6 +60,8 @@ func ConfigureOBS(configuration Config) {
 	Cameras = make(map[string]interface{})
 	Cameras, err = CQ.Object("cameras")
 
+	Players = make(map[string]interface{})
+
 	teamConfigurations := make(map[string]*jsonq.JsonQuery)
 	teamConfigurations["A"] = LoadJsonFile(*configuration.TeamAFile)
 	teamConfigurations["B"] = LoadJsonFile(*configuration.TeamBFile)
@@ -75,16 +77,24 @@ func ConfigureOBS(configuration Config) {
 		}
 
 		for steamId, iPlayerConf := range teamConf {
-			playerConf := iPlayerConf.(Player)
+			var playerConf = make(map[string]interface{})
+			playerConf = iPlayerConf.(map[string]interface{})
+			var p Player
+
 			// Jos pelaajan place-arvoksi on annettu 0, ei tämän videokuvaa näytetä observauksen aikana.
-			cameraId := teamLetter + strconv.Itoa(playerConf.Place)
-			playerConf.Camera = Cameras[cameraId].(string)
-			log.Printf("%s -> %s : %d - %s\n", steamId, playerConf.PlayerName, playerConf.Place, playerConf.Camera)
-			Players[steamId] = playerConf
+			// Jostain syystä JSONin sisällä oleva integer tulkitaankin juuri nyt floatiksi, minkä
+			// vuoksi tässä kohtaa joutuu tekemään ensin castauksen ensin float64:ksi ja sitten vasta
+			// integeriksi.
+			cameraId := teamLetter + strconv.Itoa(int(playerConf["place"].(float64)))
+			p.Camera = Cameras[cameraId].(string)
+			p.PlayerName = playerConf["player_name"].(string)
+			p.Place = int(playerConf["place"].(float64))
+			log.Printf("%s -> %s : %d - %s\n", steamId, p.PlayerName, p.Place, p.Camera)
+			Players[steamId] = p
 		}
 	}
 
-	log.Println(Players)
+	log.Printf("%v", Players)
 	log.Println("OBS konfiguraation lataus tehty ja palvelimiin yhdistetty.")
 }
 
