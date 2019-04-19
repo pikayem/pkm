@@ -53,7 +53,7 @@ func getRawPost(r *http.Request) (body []byte) {
 }
 
 func setup() {
-	pConfFilename := flag.String("conf", "internal.json", "JSON konfiguraatiotiedosto yleisille asetuksille")
+	pConfFilename := flag.String("conf", "pkm.json", "JSON konfiguraatiotiedosto yleisille asetuksille")
 
 	obsConfig := Config{}
 	obsConfig.TeamAFile = flag.String("A", "team1.json", "JSON konfiguraatiotiedosto A-tiimille")
@@ -69,13 +69,13 @@ func listenAddress() string {
 	var address, port string
 	var err error
 
-	address, err = CQ.String("internal", "address")
+	address, err = CQ.String("pkm", "address")
 	if err != nil {
 		log.Fatal("Puuttuva tai virheellinen PKM osoitekonfiguraatio: ", err)
 		os.Exit(1)
 	}
 
-	port, err = CQ.String("internal", "port")
+	port, err = CQ.String("pkm", "port")
 	if err != nil {
 		log.Fatal("Puuttuva tai virheellinen PKM porttikonfiguraatio: ", err)
 		os.Exit(1)
