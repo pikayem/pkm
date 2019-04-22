@@ -11,6 +11,10 @@ import (
 	"os"
 )
 
+var (
+	teams map[string]map[string]Player
+)
+
 func Run() {
 	setup()
 
@@ -56,13 +60,20 @@ func setup() {
 	pConfFilename := flag.String("conf", "pkm.json", "JSON konfiguraatiotiedosto yleisille asetuksille")
 
 	obsConfig := Config{}
-	obsConfig.TeamAFile = flag.String("A", "team1.json", "JSON konfiguraatiotiedosto A-tiimille")
-	obsConfig.TeamBFile = flag.String("B", "team2.json", "JSON konfiguraatiotiedosto B-tiimille")
+	obsConfig.TeamAFile = flag.String("A", "", "JSON konfiguraatiotiedosto A-tiimille")
+	obsConfig.TeamBFile = flag.String("B", "", "JSON konfiguraatiotiedosto B-tiimille")
 	obsConfig.TestOnly = flag.Bool("test", false, "testaa palvelinsovellusta paikallisesti lähettämättä ohjauskomentoja")
 	flag.Parse()
 
+	configureGameState()
 	ConfigurePKM(*pConfFilename)
 	ConfigureOBS(obsConfig)
+}
+
+func configureGameState() {
+	teams = make(map[string]map[string]Player)
+	teams["T"] = make(map[string]Player)
+	teams["CT"] = make(map[string]Player)
 }
 
 func listenAddress() string {
