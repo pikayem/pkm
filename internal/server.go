@@ -37,7 +37,7 @@ func ReceiveGameStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	if player != nil {
 		SwitchPlayer(player["steamid"].(string))
-		log.Print("\"" + player["steamid"].(string) + "\": {\"player_name\": \"" + player["name"].(string) + "\", \"place\": 0},")
+		log.Print("Observattavana: \"" + player["steamid"].(string) + "\": {\"player_name\": \"" + player["name"].(string) + "\", \"place\": 0},")
 	}
 
 	w.WriteHeader(http.StatusOK)
