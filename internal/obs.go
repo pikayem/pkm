@@ -101,21 +101,23 @@ func ConfigureOBS(configuration Config) {
 // SwitchPlayer käskee tunnettuja palvelimia vaihtamaan inputtia, samat komennot jokaiselle.
 // Inputtien nimet pitää olla OBS:ssä uniikkeja jotta vain oikea kone reagoi (muut antavat virheen josta ei välitetä)
 
-//todo: silmukoita palvelimista, vai oma funktio joka lähettää kaikille
 func SwitchPlayer(currentPlayerSID string) {
-	cp := Players[currentPlayerSID].(Player)
-	pp := Players[previousPlayerSID].(Player)
-
-	log.Println("Valittu pelaajakamera: ", cp.Camera)
-	if cp.Camera == "" {
-		// TODO: formaatti sellaiseksi että voi copypasteta suoraan conffiin
+	if Players[currentPlayerSID] == nil {
 		log.Printf("Pelaajatunnusta %s ei löytynyt. Pelaajakuvan vaihto ei onnistu.\n", currentPlayerSID)
 		previousPlayerSID = "0"
 		return
 	}
+	cp := Players[currentPlayerSID].(Player)
+
+	var pp Player
+	if Players[previousPlayerSID] != nil {
+		pp = Players[previousPlayerSID].(Player)
+	}
+
+	log.Println("Valittu pelaajakamera: ", cp.Camera)
 
 	if previousPlayerSID == "" {
-		log.Printf("nollataan")
+		log.Println("nollataan")
 		// Piilotetaan kaikki kamerakuvat, koska muuten saadaan tuplia
 		for _, p := range Players {
 			player := p.(Player)
