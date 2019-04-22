@@ -24,6 +24,7 @@ func Run() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", ReceiveGameStatus)
+	router.HandleFunc("/state", ReportGameState)
 	http.Handle("/", router)
 
 	log.Fatal(http.ListenAndServe(listenAddress, nil))
@@ -33,6 +34,14 @@ func Run() {
 func ReceiveGameStatus(w http.ResponseWriter, r *http.Request) {
 	var data *jsonq.JsonQuery
 	data = DecodeJsonToJsonQ(bytes.NewReader(getRawPost(r)))
+func ReportGameState(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	s, err := json.MarshalIndent(teams, "", "    ")
+	if err != nil {
+		log.Println("Joukkuestatuksen JSON-käännös epäonnistui: ", err)
+	}
+	w.Write(s)
+}
 
 	// Varmista että JSON:issa tuli mukana pelaajatieto ja yritä vaihtaa kuvaa ainoastaan jos se löytyy
 	player, err := data.Object("player")
