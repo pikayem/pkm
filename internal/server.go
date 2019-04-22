@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/jsonq"
@@ -33,7 +34,15 @@ func Run() {
 // ReceiveGameStatus käsittelee CS:GO observerin lähettämän pelidatapaketin
 func ReceiveGameStatus(w http.ResponseWriter, r *http.Request) {
 	var data *jsonq.JsonQuery
-	data = DecodeJsonToJsonQ(bytes.NewReader(getRawPost(r)))
+	raw := getRawPost(r)
+	data = DecodeJsonToJsonQ(bytes.NewReader(raw))
+
+	_ = updateGameState(data)
+	_ = updateObserverState(data)
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func ReportGameState(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	s, err := json.MarshalIndent(teams, "", "    ")
@@ -43,6 +52,16 @@ func ReportGameState(w http.ResponseWriter, r *http.Request) {
 	w.Write(s)
 }
 
+func getRawPost(r *http.Request) (body []byte) {
+	var err error
+	body, err = ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return body
+}
+
+func updateObserverState(data *jsonq.JsonQuery) error {
 	// Varmista että JSON:issa tuli mukana pelaajatieto ja yritä vaihtaa kuvaa ainoastaan jos se löytyy
 	player, err := data.Object("player")
 	if err != nil {
@@ -53,16 +72,26 @@ func ReportGameState(w http.ResponseWriter, r *http.Request) {
 		log.Print("Observattavana: \"" + player["steamid"].(string) + "\": {\"player_name\": \"" + player["name"].(string) + "\", \"place\": 0},")
 	}
 
-	w.WriteHeader(http.StatusOK)
+	return err
 }
 
-func getRawPost(r *http.Request) (body []byte) {
-	var err error
-	body, err = ioutil.ReadAll(r.Body)
+func updateGameState(data *jsonq.JsonQuery) error {
+	allPlayers, err := data.Object("allplayers")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	} else {
+		for k, v := range allPlayers {
+			p := Player{v.(map[string]interface{})["name"].(string), "", 0}
+			switch v.(map[string]interface{})["team"].(string) {
+			case "T":
+				teams["T"][k] = p
+			case "CT":
+				teams["CT"][k] = p
+			}
+		}
 	}
-	return body
+
+	return err
 }
 
 func setup() {
