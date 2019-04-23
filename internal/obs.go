@@ -158,7 +158,7 @@ func setCameraVisibility(camera string, visible bool) {
 	}
 }
 
-func (obs obsServer) Connect() error {
+func (obs *obsServer) Connect() error {
 	var err error
 	u := url.URL{Scheme: "ws", Host: obs.host(), Path: "/"}
 	obs.connection, _, err = websocket.DefaultDialer.Dial(u.String(), nil)
