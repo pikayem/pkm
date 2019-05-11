@@ -14,6 +14,7 @@ import (
 
 var (
 	teams map[string]map[string]Player
+	lastGSIJSON []byte
 )
 
 func Run() {
@@ -26,6 +27,7 @@ func Run() {
 
 	router.HandleFunc("/", ReceiveGameStatus)
 	router.HandleFunc("/state", ReportGameState)
+	router.HandleFunc("/lastgsijson", ReportLastGSIJSON)
 	http.Handle("/", router)
 
 	log.Fatal(http.ListenAndServe(listenAddress, nil))
@@ -35,6 +37,7 @@ func Run() {
 func ReceiveGameStatus(w http.ResponseWriter, r *http.Request) {
 	var data *jsonq.JsonQuery
 	raw := getRawPost(r)
+	lastGSIJSON = raw
 	data = DecodeJsonToJsonQ(bytes.NewReader(raw))
 
 	_ = updateGameState(data)
@@ -50,6 +53,11 @@ func ReportGameState(w http.ResponseWriter, r *http.Request) {
 		log.Println("Joukkuestatuksen JSON-käännös epäonnistui: ", err)
 	}
 	w.Write(s)
+}
+
+func ReportLastGSIJSON(w http.ResponseWriter, r *http.Request)  {
+	w.WriteHeader(http.StatusOK)
+	w.Write(lastGSIJSON)
 }
 
 func getRawPost(r *http.Request) (body []byte) {
