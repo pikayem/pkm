@@ -104,6 +104,7 @@ func ConfigureOBS(configuration Config) {
 func SwitchPlayer(currentPlayerSID string) {
 	if Players[currentPlayerSID] == nil {
 		log.Printf("Pelaajatunnusta %s ei löytynyt. Pelaajakuvan vaihto ei onnistu.\n", currentPlayerSID)
+		hideAllCameras()
 		previousPlayerSID = "0"
 		return
 	}
@@ -155,6 +156,12 @@ func serverSetup() {
 func setCameraVisibility(camera string, visible bool) {
 	for _, s := range obsServers {
 		s.SetVisibility(camera, visible)
+	}
+}
+
+func hideAllCameras() {
+	for i := 1; i <= 10; i++ {
+		setCameraVisibility("cam"+strconv.Itoa(i), false)
 	}
 }
 
