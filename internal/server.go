@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	teams map[string]map[string]Player
+	teams       map[string]map[string]Player
 	lastGSIJSON []byte
 	messenger   *broker.Broker
 )
