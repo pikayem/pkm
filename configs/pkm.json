@@ -3,6 +3,9 @@
 	{
 		"address": "127.0.0.1", "port": "1999"
 	},
+	"gsi_pusher":{
+		"address": "127.0.0.1", "port": "2000"
+	},
 	"camera_servers":
 	[
 		{"address": "127.0.0.1", "port": "4444"},

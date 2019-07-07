@@ -6,6 +6,7 @@ import (
 	"flag"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/jsonq"
+	"github.com/pikayem/pkm/internal/broker"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,13 +15,14 @@ import (
 var (
 	teams map[string]map[string]Player
 	lastGSIJSON []byte
+	messenger   *broker.Broker
 )
 
 func Run() {
 	setup()
 
-	listenAddress := listenAddress()
-	log.Print("PKM palvelin käynnistyy osoitteessa: " + listenAddress)
+	pkmListenAddress := pkmListenAddress()
+	log.Print("PKM palvelin käynnistyy osoitteessa: " + pkmListenAddress)
 
 	router := mux.NewRouter()
 
@@ -30,7 +32,15 @@ func Run() {
 	router.HandleFunc("/lastgsijson", ReportLastGSIJSON)
 	//http.Handle("/", router)
 
-	log.Fatal(http.ListenAndServe(listenAddress, router))
+	go func() {
+		log.Fatal(http.ListenAndServe(pkmListenAddress, nil))
+	}()
+
+	gsiPusherListenAddress := gsiPusherListenAddress()
+	log.Print("GSI Pusher palvelin käynnistyy osoitteessa: " + gsiPusherListenAddress)
+
+	messenger = broker.NewServer()
+	log.Fatal("GSI välityspalvelun virhe: ", http.ListenAndServe(gsiPusherListenAddress, messenger))
 }
 
 // ReceiveGameStatus käsittelee CS:GO observerin lähettämän pelidatapaketin
@@ -115,6 +125,12 @@ func updateGameState(data *jsonq.JsonQuery) error {
 		}
 	}
 
+	s, err := json.Marshal(teams)
+	if err != nil {
+		log.Println("Joukkuestatuksen JSON-käännös epäonnistui: ", err)
+	}
+
+	messenger.Notifier <- []byte(s)
 	return err
 }
 
@@ -138,7 +154,7 @@ func configureGameState() {
 	teams["CT"] = make(map[string]Player)
 }
 
-func listenAddress() string {
+func pkmListenAddress() string {
 	var address, port string
 	var err error
 
@@ -150,6 +166,25 @@ func listenAddress() string {
 	port, err = CQ.String("pkm", "port")
 	if err != nil {
 		log.Fatal("Puuttuva tai virheellinen PKM porttikonfiguraatio: ", err)
+	}
+
+	return address + ":" + port
+}
+
+func gsiPusherListenAddress() string {
+	var address, port string
+	var err error
+
+	address, err = CQ.String("gsi_pusher", "address")
+	if err != nil {
+		log.Fatal("Puuttuva tai virheellinen GSI Pusher osoitekonfiguraatio: ", err)
+		os.Exit(1)
+	}
+
+	port, err = CQ.String("gsi_pusher", "port")
+	if err != nil {
+		log.Fatal("Puuttuva tai virheellinen GSI Pusher porttikonfiguraatio: ", err)
+		os.Exit(1)
 	}
 
 	return address + ":" + port
