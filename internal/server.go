@@ -27,6 +27,7 @@ func Run() {
 
 	router.HandleFunc("/", ReceiveGameStatus)
 	router.HandleFunc("/state", ReportGameState)
+	//router.HandleFunc("/teams", ReportTeams)
 	router.HandleFunc("/lastgsijson", ReportLastGSIJSON)
 	http.Handle("/", router)
 
@@ -35,6 +36,10 @@ func Run() {
 
 // ReceiveGameStatus käsittelee CS:GO observerin lähettämän pelidatapaketin
 func ReceiveGameStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	var data *jsonq.JsonQuery
 	raw := getRawPost(r)
 	lastGSIJSON = raw
