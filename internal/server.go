@@ -27,7 +27,7 @@ func Run() {
 
 	router.HandleFunc("/", ReceiveGameStatus)
 	router.HandleFunc("/state", ReportGameState)
-	//router.HandleFunc("/teams", ReportTeams)
+	router.HandleFunc("/players", ReportConfPlayers)
 	router.HandleFunc("/lastgsijson", ReportLastGSIJSON)
 	http.Handle("/", router)
 
@@ -56,6 +56,15 @@ func ReportGameState(w http.ResponseWriter, r *http.Request) {
 	s, err := json.MarshalIndent(teams, "", "    ")
 	if err != nil {
 		log.Println("Joukkuestatuksen JSON-käännös epäonnistui: ", err)
+	}
+	w.Write(s)
+}
+
+func ReportConfPlayers(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	s, err := json.MarshalIndent(Players, "", "    ")
+	if err != nil {
+		log.Println("Pelaajaconfin JSON-käännös epäonnistui: ", err)
 	}
 	w.Write(s)
 }
