@@ -27,11 +27,11 @@ func Run() {
 
 	router.HandleFunc("/", ReceiveGameStatus)
 	router.HandleFunc("/state", ReportGameState)
-	router.HandleFunc("/players", ReportConfPlayers)
+	router.HandleFunc("/players", ReportConfPlayers).Methods("GET", "OPTIONS")
 	router.HandleFunc("/lastgsijson", ReportLastGSIJSON)
-	http.Handle("/", router)
+	//http.Handle("/", router)
 
-	log.Fatal(http.ListenAndServe(listenAddress, nil))
+	log.Fatal(http.ListenAndServe(listenAddress, router))
 }
 
 // ReceiveGameStatus käsittelee CS:GO observerin lähettämän pelidatapaketin
@@ -61,7 +61,10 @@ func ReportGameState(w http.ResponseWriter, r *http.Request) {
 }
 
 func ReportConfPlayers(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	s, err := json.MarshalIndent(Players, "", "    ")
 	if err != nil {
 		log.Println("Pelaajaconfin JSON-käännös epäonnistui: ", err)
