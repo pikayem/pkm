@@ -33,7 +33,7 @@ Kummallekin videoserverille:
   * Avaa/luo tyhjä OBS scene collection. Tarvitaan yksi scene, nimeltään "Scene1"..
   * Aktivoi scenelle NDI dedicated output, suositeltavaa nimetä ne esim. "serverA" ja "serverB". Tämä on se nimi jolla kuvalähteet näkyvät NDI:n ylitse.
 
-Kaikki videoserveriin kytketyt kamerat tuodaan tähän sceneen nimettynä "cam1"-"cam5" ensimmäisellä ja "cam1"-"cam10" toisella serverillä. Kameroiden numerointi kannattaa aloittaa pelaajien selän takaa katsoen vasemmalta. Kaikki kamerat asetetaan `fit-to-screen` tilaan, ja normaalitilassa kaikkien `visibility` pois päältä. Myös webbikameroiden kuva-/videoasetukset kannattaa tarkistaa optimaalisen kuvanlaadun saamiseksi.
+Kaikki videoserveriin kytketyt kamerat tuodaan tähän sceneen nimettynä "cam1"-"cam5" ensimmäisellä ja "cam1"-"cam10" toisella serverillä. Kameroiden numerointi kannattaa aloittaa pelaajien selän takaa katsoen vasemmalta. Kaikki kamerat asetetaan `fit-to-screen` tilaan, ja normaalitilassa kaikkien `visibility` pois päältä. Myös webbikameroiden kuva-/videoasetukset kannattaa tarkistaa optimaalisen kuvanlaadun saamiseksi. Serverin asennus pelipöytiin niin että A on SL, B SR puolella.
 
 OBS:n Websocket-plugin kuuntelee oletuksena portissa 4444. Tällä hetkellä tässä projektissa ei ole autentikaatiotukea, koska järjestelmä on tarkoitettu vain suljetussa verkossa ajettavaksi.
 
@@ -52,3 +52,12 @@ Asetustiedostoihin laitetaan pelaajien steamID:t SteamID64-muodossa, ja tiedosto
 Kopioi ja muokkaa `pkm.json`, `team1.json` ja `team2.json` tiedostot `pkm.exe`:n kanssa samaan hakemistoon. Sen jälkeen suorita:
 
 `./pkm -A team2.json -B team1.json`
+
+
+# rajapinnat
+
+järjestelmä osaa antaa tilatietoa ulospäin muille järjestelmille
+
+"/state" sisältää json:n tällähetkellä serverillä nähdyistä id:istä
+"/players" näyttää tällähetkellä conffista ladatut pelaajat 
+"/lastgsijson" antaa paikkatiedolla rikastetun GSI-datan
