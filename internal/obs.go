@@ -5,11 +5,10 @@ import (
 	"github.com/jmoiron/jsonq"
 
 	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/url"
 	"strconv"
-
-	"github.com/gorilla/websocket"
 )
 
 type (
@@ -76,14 +75,15 @@ func ConfigureOBS(configuration Config) {
 			log.Fatalln("Joukkuekonfiguraation lukeminen ei onnistunut: ", err)
 		}
 
-		for steamId, iPlayerConf := range teamConf {
+		for confSteamId, iPlayerConf := range teamConf {
+			var steamId = UnifySteamId(confSteamId)
 			var playerConf = make(map[string]interface{})
 			playerConf = iPlayerConf.(map[string]interface{})
 			var p Player
 
 			// Jos pelaajan place-arvoksi on annettu 0, ei tämän videokuvaa näytetä observauksen aikana.
 			// Jostain syystä JSONin sisällä oleva integer tulkitaankin juuri nyt floatiksi, minkä
-			// vuoksi tässä kohtaa joutuu tekemään ensin castauksen ensin float64:ksi ja sitten vasta
+			// vuoksi tässä kohtaa joutuu tekemään ensin castauksen float64:ksi ja sitten vasta
 			// integeriksi.
 			cameraId := teamLetter + strconv.Itoa(int(playerConf["place"].(float64)))
 			p.Camera = Cameras[cameraId].(string)
