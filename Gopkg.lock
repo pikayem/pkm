@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:9db215388df93a170c932da8efe861764bad7da7cc14069a94e3e34a75d93259"
+  name = "github.com/Acidic9/go-steam"
+  packages = ["steamid"]
+  pruneopts = "UT"
+  revision = "47418f6637e633458ead8417a58264f37a4d33ec"
+
+[[projects]]
   digest = "1:ca59b1175189b3f0e9f1793d2c350114be36eaabbe5b9f554b35edee1de50aea"
   name = "github.com/gorilla/mux"
   packages = ["."]
@@ -29,6 +37,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Acidic9/go-steam/steamid",
     "github.com/gorilla/mux",
     "github.com/gorilla/websocket",
     "github.com/jmoiron/jsonq",

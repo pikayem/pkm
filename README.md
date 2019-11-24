@@ -41,11 +41,15 @@ Observer-koneelle asennetaan kansioon `steamapps\common\Counter-Strike Global Of
 
 [Lisätiedot GSI:stä.](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration)
 
-Asetustiedostoihin laitetaan pelaajien steamID:t SteamID64-muodossa, ja tiedostoja on yksi per joukkue. Paikat myöskin pelaajien takaa vasemmalta laskien. Paikka `0` tarkoittaa sitä, että pelaajalla ei ole kameraa tai kamera on esimerkiksi väärin suunnattu, ja sen takia halutaan hetkellisesti poistaa käytöstä näin:
+Asetustiedostoihin laitetaan pelaajien steamID:t SteamID, SteamID3, SteamID32 tai SteamID64 muodossa. Tiedostoja on yksi per joukkue. Paikat myöskin pelaajien takaa vasemmalta laskien. Paikka `0` tarkoittaa sitä, että pelaajalla ei ole kameraa tai kamera on esimerkiksi väärin suunnattu, ja sen takia halutaan hetkellisesti poistaa käytöstä näin:
 
   * editoi tiedostoa ja muuta halutulle kameralle paikaksi `0`,
   * keskeytä ajossa oleva ohjelma `ctrl+c` ja
   * käynnistä ohjelma uudelleen.
+  
+Mikäli PKM-kone on kytketty internettiin reitittävään verkkoon, voit lisätä ```pkm.exe```:n kanssa samaan kansioon myös ```steam.apikey``` tiedoston, jonka ainoa sisältö on yksi Steam Web API -avain. Tällöin PKM kysyy Steamilta konfiguraatioista lukemiaan SteamID:itä vastaavat pelaajien näyttönimet, tai raportoi jos jollain SteamID:llä ei löytynyt pelaajan tietoja Steamista.
+  
+API-avaimen saa Steam-tunnuksilla [Steamin kehittäjäportaalista](https://steamcommunity.com/dev/apikey), joka myös näyttää jo mahdollisetn aikaisemmin luodun avaimen kirjauduttuasi.
 
 # Serverin käynnistys
 
@@ -53,11 +57,14 @@ Kopioi ja muokkaa `pkm.json`, `team1.json` ja `team2.json` tiedostot `pkm.exe`:n
 
 `./pkm -A team2.json -B team1.json`
 
+Joukkuekonfiguraatiot kannattaa kirjoittaa hyvissä ajoin etukäteen, jolloin PKM:n uudelleenkonfigurointi pelistä toiseen sujuu helposti vain PKM:n uudelleenkäynnistämällä uusilla joukkuetiedostoparametreilla.
 
-# rajapinnat
+PKM:n oman konfiguraation voi myös määrittää asuvan eri paikassa ```-conf``` vivulla.
 
-järjestelmä osaa antaa tilatietoa ulospäin muille järjestelmille
+# Rajapinnat
 
-"/state" sisältää json:n tällähetkellä serverillä nähdyistä id:istä
-"/players" näyttää tällähetkellä conffista ladatut pelaajat 
-"/lastgsijson" antaa paikkatiedolla rikastetun GSI-datan
+Järjestelmä osaa antaa tilatietoa ulospäin muille järjestelmille
+
+* ```/state``` sisältää JSON-olion tällä hetkellä serverillä nähdyistä id:istä
+* ```/players``` näyttää tällä hetkellä konfiguraatiosta ladatut pelaajat 
+* ```/lastgsijson``` antaa istumapaikkatiedolla rikastetun GSI-datan

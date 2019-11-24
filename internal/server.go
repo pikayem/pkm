@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 var (
@@ -146,13 +145,11 @@ func listenAddress() string {
 	address, err = CQ.String("pkm", "address")
 	if err != nil {
 		log.Fatal("Puuttuva tai virheellinen PKM osoitekonfiguraatio: ", err)
-		os.Exit(1)
 	}
 
 	port, err = CQ.String("pkm", "port")
 	if err != nil {
 		log.Fatal("Puuttuva tai virheellinen PKM porttikonfiguraatio: ", err)
-		os.Exit(1)
 	}
 
 	return address + ":" + port

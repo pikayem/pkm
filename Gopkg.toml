@@ -33,10 +33,14 @@
   branch = "master"
   name = "github.com/jmoiron/jsonq"
 
-[prune]
-  go-tests = true
-  unused-packages = true
-
 [[constraint]]
   name = "github.com/gorilla/mux"
   version = "1.7.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/Acidic9/go-steam"
+
+[prune]
+  go-tests = true
+  unused-packages = true
