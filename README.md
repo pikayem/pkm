@@ -53,11 +53,14 @@ Kopioi ja muokkaa `pkm.json`, `team1.json` ja `team2.json` tiedostot `pkm.exe`:n
 
 `./pkm -A team2.json -B team1.json`
 
+Joukkuekonfiguraatiot kannattaa kirjoittaa hyvissä ajoin etukäteen, jolloin PKM:n uudelleenkonfigurointi pelistä toiseen sujuu helposti vain PKM:n uudelleenkäynnistämällä uusilla joukkuetiedostoparametreilla.
 
-# rajapinnat
+PKM:n oman konfiguraation voi myös määrittää asuvan eri paikassa ```-conf``` vivulla
 
-järjestelmä osaa antaa tilatietoa ulospäin muille järjestelmille
+# Rajapinnat
 
-"/state" sisältää json:n tällähetkellä serverillä nähdyistä id:istä
-"/players" näyttää tällähetkellä conffista ladatut pelaajat 
-"/lastgsijson" antaa paikkatiedolla rikastetun GSI-datan
+Järjestelmä osaa antaa tilatietoa ulospäin muille järjestelmille
+
+* ```/state``` sisältää JSON-olion tällä hetkellä serverillä nähdyistä id:istä
+* ```/players``` näyttää tällä hetkellä konfiguraatiosta ladatut pelaajat 
+* ```/lastgsijson``` antaa istumapaikkatiedolla rikastetun GSI-datan
