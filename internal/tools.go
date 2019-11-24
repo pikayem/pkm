@@ -6,10 +6,17 @@ import (
 	"github.com/Acidic9/go-steam/steamid"
 	"github.com/jmoiron/jsonq"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
+)
+
+const (
+	apikeyFilename                = "steam.apikey"
+	steamWebAPIGetPlayerSummaries = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
 )
 
 var (
@@ -75,4 +82,51 @@ func UnifySteamId(confSteamId string) string {
 	}
 
 	return strconv.Itoa(int(steamId64.Uint64()))
+}
+
+func VerifySteamId(steamId string) bool {
+	var apikey []byte
+	var err error
+
+	apikey, err = ioutil.ReadFile(apikeyFilename)
+	if err != nil {
+		log.Printf("SteamID:tä %d ei tarkistettu, Steam API-avaintiedostoa '%s' ei voitu avata: %s", steamId, apikeyFilename, err)
+		return false
+	}
+	var resp *http.Response
+	queryUrl := fmt.Sprintf("%s?key=%s&steamids=%s", steamWebAPIGetPlayerSummaries, string(apikey), steamId)
+
+	resp, err = http.Get(queryUrl)
+	if err != nil {
+		log.Fatalf("HTTPS GET Steam API:in epäonnistui: %s", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		steamUser := DecodeJsonToJsonQ(resp.Body)
+		players, err := steamUser.Array("response", "players")
+		if err != nil {
+			log.Fatalf("Players-listaa ei voitu parsia Steam API-kutsun vastauksesta: %s", err)
+		}
+
+		switch len(players) {
+		case 0:
+			log.Printf("SteamID:tä %s ei löytynyt Steamista", steamId)
+			return false
+		case 1:
+			name, err := steamUser.String("response", "players", "0", "personaname")
+			if err != nil {
+				log.Printf("Steam-käyttäjänimen parsinta JSON-vastauksesta epäonnistui: %s", err)
+				return  false
+			}
+			log.Printf("SteamID %s, käyttäjätunnus %s", steamId, name)
+			return true
+		default:
+			log.Println("Liian monta pelaajatietuetta palautettu Steamista")
+			return false
+		}
+	} else {
+		log.Printf("API-kutsun suoritus palautti virheen, SteamID:tä ei voitu tarkistaa: %s", resp.StatusCode)
+	}
+	return false
 }

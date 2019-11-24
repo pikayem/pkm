@@ -77,6 +77,8 @@ func ConfigureOBS(configuration Config) {
 
 		for confSteamId, iPlayerConf := range teamConf {
 			var steamId = UnifySteamId(confSteamId)
+			_ = VerifySteamId(steamId)
+
 			var playerConf = make(map[string]interface{})
 			playerConf = iPlayerConf.(map[string]interface{})
 			var p Player
