@@ -39,13 +39,14 @@ func LoadJsonFile(filename string) *jsonq.JsonQuery {
 func DecodeJsonToJsonQ(reader io.Reader) *jsonq.JsonQuery {
 	var err error
 	decoder := json.NewDecoder(reader)
-	configuration := map[string]interface{}{}
-	err = decoder.Decode(&configuration)
+	jsonStructure := map[string]interface{}{}
+	err = decoder.Decode(&jsonStructure)
 	if err != nil {
-		log.Fatalf("Konfiguraation lukuvirhe: %s", err)
+		log.Fatalf("JSON-rakenteen lukuvirhe: %s", err)
 		return nil
 	}
-	return jsonq.NewQuery(configuration)
+	return jsonq.NewQuery(jsonStructure)
+}
 
 func UnifySteamId(confSteamId string) string {
 	// Yhdenmukaista SteamID, SteamID3 tai SteamID32 SteamID64 muotoon
