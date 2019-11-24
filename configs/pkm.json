@@ -7,21 +7,5 @@
 	[
 		{"address": "127.0.0.1", "port": "4444"},
 		{"address": "localhost", "port": "4444"}
-	],
-	"cameras":
-	{
-		"A0": "foo",
-		"A1": "cam1",
-		"A2": "cam2",
-		"A3": "cam3",
-		"A4": "cam4",
-		"A5": "cam5",
-
-		"B0": "bar",
-		"B1": "cam6",
-		"B2": "cam7",
-		"B3": "cam8",
-		"B4": "cam9",
-		"B5": "cam10"
-	}
+	]
 }

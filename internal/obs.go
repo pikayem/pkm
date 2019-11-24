@@ -35,7 +35,7 @@ type (
 
 	Player struct {
 		PlayerName string `json:"player_name"`
-		Camera     string `json:"camera"` //todo: siivoa json-formaatti
+		Camera     string `json:"camera"`
 		Place      int    `json:"place"`
 	}
 )
@@ -56,11 +56,7 @@ func ConfigureOBS(configuration Config) {
 
 	testOnly = *configuration.TestOnly
 
-	Cameras = make(map[string]interface{})
-	Cameras, err = CQ.Object("cameras")
-
 	Players = make(map[string]interface{})
-
 	teamConfigurations := make(map[string]*jsonq.JsonQuery)
 	teamConfigurations["A"] = LoadJsonFile(*configuration.TeamAFile)
 	teamConfigurations["B"] = LoadJsonFile(*configuration.TeamBFile)
@@ -87,11 +83,10 @@ func ConfigureOBS(configuration Config) {
 			// Jostain syystä JSONin sisällä oleva integer tulkitaankin juuri nyt floatiksi, minkä
 			// vuoksi tässä kohtaa joutuu tekemään ensin castauksen float64:ksi ja sitten vasta
 			// integeriksi.
-			cameraId := teamLetter + strconv.Itoa(int(playerConf["place"].(float64)))
-			p.Camera = Cameras[cameraId].(string)
+			p.Camera = teamLetter + strconv.Itoa(int(playerConf["place"].(float64)))
 			p.PlayerName = playerConf["player_name"].(string)
 			p.Place = int(playerConf["place"].(float64))
-			log.Printf("%s -> %s : %d - %s\n", steamId, p.PlayerName, p.Place, p.Camera)
+			log.Printf("%s -> %s : %d - %s", steamId, p.PlayerName, p.Place, p.Camera)
 			Players[steamId] = p
 		}
 	}
@@ -105,7 +100,7 @@ func ConfigureOBS(configuration Config) {
 
 func SwitchPlayer(currentPlayerSID string) {
 	if Players[currentPlayerSID] == nil {
-		log.Printf("Pelaajatunnusta %s ei löytynyt. Pelaajakuvan vaihto ei onnistu.\n", currentPlayerSID)
+		log.Printf("Pelaajatunnusta %s ei löytynyt. Pelaajakuvan vaihto ei onnistu.", currentPlayerSID)
 		hideAllCameras()
 		previousPlayerSID = "0"
 		return
@@ -120,12 +115,9 @@ func SwitchPlayer(currentPlayerSID string) {
 	log.Println("Valittu pelaajakamera: ", cp.Camera)
 
 	if previousPlayerSID == "" {
-		log.Println("nollataan")
+		log.Println("Piilotetaan kaikki kamerakuvat")
 		// Piilotetaan kaikki kamerakuvat, koska muuten saadaan tuplia
-		for _, p := range Players {
-			player := p.(Player)
-			setCameraVisibility(player.Camera, false)
-		}
+		hideAllCameras()
 	}
 
 	if currentPlayerSID != previousPlayerSID {
@@ -162,8 +154,8 @@ func setCameraVisibility(camera string, visible bool) {
 }
 
 func hideAllCameras() {
-	for i := 1; i <= 10; i++ {
-		setCameraVisibility("cam"+strconv.Itoa(i), false)
+	for _, p := range Players {
+		setCameraVisibility(p.(Player).Camera, false)
 	}
 }
 
